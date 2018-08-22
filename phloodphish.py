@@ -24,7 +24,7 @@ pswds = json.loads(open('passwords.json').read())
 while True:
     # Sleep random number of seconds as to not DDOS the site and make it harder for them to ignore blocks of flooded fake
     # based on time stamps.
-    time.sleep(random.randint(1, 3))
+    time.sleep(random.randint(60, 600))
 
     # Grab a random domain from the domains.json list
     domain = random.choice(domains)
