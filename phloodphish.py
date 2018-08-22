@@ -2,7 +2,7 @@
 # send garbage data to scammer
 # His link: https://www.youtube.com/channel/UCrUL8K81R4VBzm-KOYwrcxQ
 # The video in question: https://www.youtube.com/watch?v=UtNYzv8gLbs
-
+# Password and Name dictionaries sourced from https://github.com/danielmiessler/SecLists
 
 import requests
 import os
@@ -18,6 +18,8 @@ random.seed = (os.urandom(1024))
 names = json.loads(open('names.json').read())
 words = json.loads(open('words.json').read())
 domains = json.loads(open('domains.json').read())
+surnames = json.loads(open('surnames.json').read())
+pswds = json.loads(open('passwords.json').read())
 
 while True:
     # Sleep random number of seconds as to not DDOS the site and make it harder for them to ignore blocks of flooded fake
@@ -31,6 +33,9 @@ while True:
     if random.getrandbits(1):
 
         name = random.choice(names)
+
+        if random.randint(1, 10) == 1:
+            name += '.' + random.choice(surnames)
 
     else:
         name_words = random.sample(words, 2)
@@ -46,12 +51,14 @@ while True:
     if random.getrandbits(1):
 
         # Create a random 8 character password with letters defined in chars1 variable
-        password = ''.join(random.choice(chars1) for i in range(8))
+        password = ''.join(random.choice(chars1) for i in range(random.randint(8, 12)))
 
-    else:
+    elif random.getrandbits(1):
         pass_words = random.sample(words, 2)
         pass_extra = ''.join(random.choice(string.digits) for i in range(random.randint(0, 2)))
         password = "".join(pass_words) + pass_extra
+    else:
+        password = random.choice(pswds)
 
     # The following commented lines of code are what will be needed from running DevTools in chrome and seeing the format
     # of the form data being sent to the scamming site. Feel ree to add more variables if there is a hash token that needs to be
