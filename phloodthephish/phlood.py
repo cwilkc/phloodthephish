@@ -118,22 +118,20 @@ for i in range(a.interval):
 
     user_agent = random.choice(useragents)
 
-    data = {
-        a.uvar: username,
-        a.pvar: password
-    }
-
-    header = {
-        'User-Agent': user_agent
-    }
-
-    # The following commented lines of code are what will be needed from running DevTools in chrome and seeing the format
-    # of the form data being sent to the scamming site. Feel ree to add more variables if there is a hash token that needs to be
-    # passed as well but the majorite seem to have some variation of #username and #password. Replace the hashed names with the
-    # correct variables called by the form and set the URL to the URL shown in the forn data.
-
     if a.url:
+
+        # Note until BeautifulSoup is implemented and tested, the keys for username and password will need to match
+        # the form variables on the URL otherwise they will easily know its fake! You can pass these variables with the
+        # uvar and pvar command line arguments. By default they will be just 'username' and 'password'
+        data = {
+            a.uvar: username,
+            a.pvar: password,
+        }
+
+        header = {
+            'User-Agent': user_agent
+        }
 
         requests.post(a.url, allow_redirects=False, data=data)
 
-    print("sending username {} and password {} \n headers {}".format(username, password, header))
+    print("sending username {} and password {}".format(username, password))
