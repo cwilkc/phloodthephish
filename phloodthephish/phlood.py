@@ -64,24 +64,15 @@ parser.add_argument(
     default='password',
 )
 
-a = parser.parse_args()
 
-# Open names, words, and domains dictionaries
-names = json.loads(open('names.json').read())
-words = json.loads(open('words.json').read())
-surnames = json.loads(open('surnames.json').read())
-pswds = json.loads(open('passwords.json').read())
-useragents = json.loads(open('useragents.json').read())
+def gen_email(domain=None):
 
-for i in range(a.interval):
-    # Sleep random number of seconds as to not DDOS the site and make it harder for them to ignore blocks of flooded fake
-    # based on time stamps.
-    time.sleep(a.time)
+    names = json.loads(open('names.json').read())
+    words = json.loads(open('words.json').read())
+    surnames = json.loads(open('surnames.json').read())
 
     # Grab a random domain from the domains.json list
-    if a.domain:
-        domain = a.domain
-    else:
+    if not domain:
         domains = json.loads(open('domains.json').read())
         domain = random.choice(domains)
 
@@ -101,7 +92,13 @@ for i in range(a.interval):
     name_extra = ''.join(random.choice(string.digits) for i in range(random.randint(1, 4)))
 
     # Create the username from the dictionary, extra digits and a domain.
-    username = name.lower() + name_extra + "@" + domain
+    return name.lower() + name_extra + "@" + domain
+
+
+def gen_password(**kwargs):
+
+    pswds = json.loads(open('passwords.json').read())
+    words = json.loads(open('words.json').read())
 
     # PASSWORD CREATION
     if random.getrandbits(1):
@@ -116,22 +113,40 @@ for i in range(a.interval):
     else:
         password = random.choice(pswds)
 
-    user_agent = random.choice(useragents)
+    return password
 
-    if a.url:
 
-        # Note until BeautifulSoup is implemented and tested, the keys for username and password will need to match
-        # the form variables on the URL otherwise they will easily know its fake! You can pass these variables with the
-        # uvar and pvar command line arguments. By default they will be just 'username' and 'password'
-        data = {
-            a.uvar: username,
-            a.pvar: password,
-        }
+def main():
+    a = parser.parse_args()
 
-        header = {
-            'User-Agent': user_agent
-        }
+    useragents = json.loads(open('useragents.json').read())
 
-        requests.post(a.url, allow_redirects=False, data=data)
+    for i in range(a.interval):
+        # Sleep random number of seconds as to not DDOS the site and make it harder for them to ignore blocks of flooded
+        # fake based on time stamps.
+        time.sleep(a.time)
 
-    print("sending username {} and password {}".format(username, password))
+        email = gen_email(domain=a.domain)
+        password = gen_password()
+
+        if a.url:
+
+            # Note until BeautifulSoup is implemented and tested, the keys for username and password will need to match
+            # the form variables on the URL otherwise they will easily know its fake! You can pass these variables with the
+            # uvar and pvar command line arguments. By default they will be just 'username' and 'password'
+            data = {
+                a.uvar: email,
+                a.pvar: password,
+            }
+
+            header = {
+                'User-Agent': random.choice(useragents)
+            }
+
+            requests.post(a.url, allow_redirects=False, data=data)
+
+        print("sending username {} and password {}".format(email, password))
+
+
+if __name__ == '__main__':
+    main()
